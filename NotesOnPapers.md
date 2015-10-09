@@ -17,6 +17,18 @@ __The gap cost__: A penalty factor, a numberor direction of the gap. No gap woul
 
 __Backtracking__: Staring at _(n,m)_ one looks at the three cells nearest, i.e. _(i+1, i+1)_, _(i+1, j)_ and _(i, j+1)_, and determines which of those cells produced the value in the current cell. This is done recursivly until _(0,0)_ is reached.
 
+### The String-to-String Correction Problem
+##### Robert A. Wagner and Michael J. Fischer
+This paper defines a general notation of ''distance'' between two strings and presents an algorithm for computing the distance in time proportional to the product of the lengths of the strings. The operations considered are:
+1. Changing one character to antoher single character
+2. Deleting one character from the given string
+3. Inserting one character into the given string
+
+__The cost function__: Let _g_ be an arbitrary cost function which assigns to each edit operation _a -> b_ a nonnegative real number _g(a -> b)_. Extend _g_ to a sequence of edit opertaions _S = s1,s2,...,sm_ by letting $$$g(S) = \sum_{i-1}^m(s_i),$$$
+
+if _m = 0_ then _g(S) = 0_. Note that the cost functions which depend on the particular characters affected by an edit operation might be useful in spelling corrections, where for example because of the conventional keyboard arrangement it may be far more likely that a character ''A'' be mistyped as an ''S'' than as a ''Y''.
+
+
 
 # Question 2: Pairwise alignment – space consumption
 - Computing the optimal score of a pairwise alignment.
