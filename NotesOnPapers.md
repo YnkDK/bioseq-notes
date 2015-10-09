@@ -28,7 +28,11 @@ __The cost function__: Let _g_ be an arbitrary cost function which assigns to ea
 
 if _m = 0_ then _g(S) = 0_. Note that the cost functions which depend on the particular characters affected by an edit operation might be useful in spelling corrections, where for example because of the conventional keyboard arrangement it may be far more likely that a character ''A'' be mistyped as an ''S'' than as a ''Y''.
 
+TODO: Read the rest of the paper
 
+### An improved Algorithm for Matching Biological Sequences
+##### Osamu Gotoh
+Introduces a new algorithm which allows muliple-sized gaps and runs in essentially _MN_ steps if the gap weight has a special form of _w(k) = uk + v_, with _u_ and _v_ larger than or equal to 0. 
 
 # Question 2: Pairwise alignment – space consumption
 - Computing the optimal score of a pairwise alignment.
