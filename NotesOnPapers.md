@@ -73,8 +73,51 @@ TODO: Read and understand
 
 ###Multiple String Comparison - The Holy Grail
 #####D. Gusfield
+In the context of molecular biology, multiple string comparison (of DNA, RNA, or pretein strings) is the most critical cutting-edge tool for _extracting and representing_ biologically important commonalities from a set of strings. These (faint) commonalities may reveal evolutionary history. Because many important commonalities are faint or widely dispersed, they might not be apparent when comparing a set of related strings.
 
-TODO:
+>**Definition (global multiple-alignment):** A global multiple alignment of _k > 2_ strings _S = {S1, S2, ..., Sk}_ is a natural generalization of alignment for two strings. Chosen spaces are inserted into (or at either end of) each of the _k_ strings so that the resulting strings have the same length, defined to be _l_. Then the strings are arrayed in _k_ rows of _l_ columns each, so that each character and space of each string is in a unique column
+
+>**Fact:** Evolutionarily and functionally related molecular string can _differ significantly_ throughout much of the string and yet perserve the same three-dimensional structure(s), or the same two-dimensional substructure(s), or the same active sites, or the same or related dispersed residues.
+
+Two strings specifying the ''same'' protein in different species may be so different that the few observed similarities may just be due to chance. When doing two-string comparison to find critical common patterns, the challenge is to pick species whose level of divergence is ''most informative'' (a vague and difficult task), this is not the case for multiple string comparison. Often, biologically important patterns that connot be revealed by comparison of two strings alone become clear when many related strings are simultaneously compared.
+
+> **Definition (local multiple-alignment):** Given a set of _k > 2_ strings _S = {S1, S2, ..., Sk}_, a _local_ multiple alignment of _S_ is obtained by selecting one substring _Si'_ from each string _Si in S_ and then globally align those substrings.
+
+> **Definition (induced pairwise alignment):** Given a multiple alignment _M_, the _induced pairwise alignment_ of two strings _Si_ and _Sj_ is obtained from _M_ by removing all rows except the two rows for _Si_ and _Sj_. That is, the induced alignment is the multiple alignment _M_ restricted to _Si_ and _Sj_. Any two opposing spaces in that induced alignment can be removed if desired.
+
+> **Defintion (score):** The _score_ of an induced pairwise alignment is determined using any chosen scoring scheme for two-string alignment in the standard manner.
+
+> **Definition (Sum of Paris):** The _sum of pairs (SP)_ score of a muliple alignment _M_ is the sum of the scores of pairwise global alignments induced by _M_
+
+> ** The SP alignment problem:** Compute a global multiple alignment _M_ with minimum sum-of-pairs score.
+
+The exact _SP_ alignment problem has been proved to be NP-complete and to sole it via dynamic programming for _k_ strings of length _n_ it takes _theta(n^k)_ and hence only practical for a small number of strings.
+
+![Global Alignment Recursion](http://cs.au.dk/~mys/bioseq/sp-exact.png "SP exact 3-MSA")
+
+
+**SPEEDUP FOR THE EXACT SOLUTION**
+In the alternative approach of forward dynamic programming, when _D(i,j,k)_ is set, _D(i,j,k)_ is then sent forward to the seven (at most) cells whose _D_ value can be influenced by cell _(i,j,k)_. 
+Another way to say this is to view optimal alignment as a shortest path problem in the weighted edit graph corresponding to a multiple alignment table. In that view, when the shortest path from the source _s_ (cell _(0,0,0)_) to a node _v_ (cell _(i,k,k)_) has been computed, the best-yet distance from _s_ to any out-neighbor of _v_ is then updated. In more detail, let _D(v)_ be the shortest distance from _s_ to _v_, let _(v,w)_ be a directed edge of weight _p(v,w)_, and let _p(w)_ be the shortest distance yet found from _s_ to _w_. After _D(v)_ is computed, _p(w)_ is immediately updated to be _min[p(w), D(v)+p(v,w)]_. Moreover, the true shortest distance from _s_ to _w_, _D(w)_, must be _p(w)_ after _p(w)_ has been updated from every node _v_ having an edge pointing into _w_. The forward dynamic programming implementation will keep a queue of nodes (cells) whose final _D_ value has not yet been set. The algorithm will set the _D_ value of the node _v_ at the head of the queue and remove that node. When it does, it updates _p(w)_ for each out-neighbor of _v_, and if _w_ is not yet in the queue, it adds _w_ to the end of the queue. It is easy to verify that when a node comes to the head of the queue, all the nodes that point to it in the graph have already been removed from the queue.
+For aligning three strings of _n_ characters each, the edit graph has roughly _n^3_ nodes and _7n^3_ edges. The Carillo and Lipman speedup excludes some nodes before the main dynamic programming computation is begun, and forwards and backwards dynamic programming is equally convenient.
+> **Definition:** Ket _d1,2(i,j)_ be the edit distance between suffixes _S1[i..n]_ and _S2[j..n]_ of strings _S1_ and _S2_. Define _d1,3(i,j)_ and _d2,3(j,k)_ analogously.
+
+These _d_ values can be computed in _O(n^2)_ time by reversing the strings and computing three pairwise distances. Also, the shortest path from node _(i,j,k)_ to node _(n,n,n)_ in the edit graph for _S1_, _S2_, _S3_ must have distance at least _d1,2(i,j) + d1,3(i,k) + d2,3(j,k)_.
+
+Now suppose that some multiple alignment of _S1, S2,_ and _S3_ is known (perhaps from a bounded error heuristic) and that the alignemnt has _SP_ score of _z_. If _D(i,j,k) + d1,2(i,j) + d1,3(i,k) + d2,3(j,j)_ is greater than _z_, then node _(i,j,k)_ cannot be on any optimal path and so _D(i,j,k)_ need not be sent forward to any cell.
+
+If no initial _z_ value is known, then the heuristic can be implemented as an A* heuristic so tha the most ''promising'' alignments are computed first.
+
+Running time for fast exact MSA algorithm: _O(''number of cells visited'' x ''time for an operation on Q'')_
+Space: _O(k^2n^2 + ''maximum size of Q'')_
+
+![Speedup exact](http://cs.au.dk/~mys/bioseq/exact-speedup.png "Speedup exact")
+
+Time and space consumption depends on the quality of the upper bound on OPT and the lower bounds on alognemtns of suffixes. In order to reduce space consumption, you might want to first run the algorithm where you do not store the graph. This gives an optimal score OPT and then rerun the algorithm with this score. This should minimize the part of the alignment graph you visit, i.e. reduce space consumption.
+
+**A bounded-error approximation method for _SP_ alignment**
+
+![Speedup exact](http://cs.au.dk/~mys/bioseq/approx.png "Speedup exact")
 
 ###CLUSTAL W: improving the sensitivity of progressive multiple sequence alignment through sequence weighting, position specific gap penalties and weight matrix choice
 #####J. D. Thompson, D.G. Higgins and T.J. Gibson.
